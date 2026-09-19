@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NGL Sender • Bulk Kirim</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0b0f1c 0%, #1a1f2f 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: rgba(22, 28, 45, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, #ffffff, #b3c7ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 span {
+      font-size: 1.8rem;
+    }
+
+    .subhead {
+      color: #8e9bb5;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      font-weight: 400;
+      border-left: 3px solid #3b4b6e;
+      padding-left: 1rem;
+      letter-spacing: 0.2px;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      color: #9aa9c7;
+      margin-bottom: 0.6rem;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      background: #0e121f;
+      border: 1px solid #2a3349;
+      border-radius: 1.2rem;
+      color: #edf2ff;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      resize: vertical;
+      font-weight: 400;
+    }
+
+    .input-field:focus {
+      border-color: #4f6ef7;
+      box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.2);
+    }
+
+    .input-field::placeholder {
+      color: #5c6b8a;
+      font-weight: 300;
+    }
+
+    textarea.input-field {
+      min-height: 90px;
+    }
+
+    /* Row untuk jumlah pesan + tombol cepat */
+    .count-row {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .count-row .input-field {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .quick-btns {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      background: #1c2333;
+      border: 1px solid #2d3852;
+      color: #a8b8dd;
+      padding: 0.7rem 1rem;
+      border-radius: 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quick-btn:hover {
+      background: #253048;
+      border-color: #4f6ef7;
+      color: #dfe7ff;
+    }
+
+    .quick-btn.active {
+      background: linear-gradient(135deg, #3f5ef0, #6c4df0);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 5px 15px -5px #2a3eb0;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1rem 1.8rem;
+      border: none;
+      border-radius: 1.5rem;
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #3f5ef0, #6c4df0);
+      color: white;
+      box-shadow: 0 10px 20px -8px #2a3eb0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #4f6ef7, #7c5cf7);
+      transform: scale(1.02);
+      box-shadow: 0 15px 25px -8px #3b4fd0;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      transform: none;
+      pointer-events: none;
+      box-shadow: none;
+      background: #2f3a5a;
+    }
+
+    .btn-secondary {
+      background: #232b3f;
+      box-shadow: none;
+      color: #b7c2db;
+      flex: 0.4;
+      font-size: 0.95rem;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #2e384f;
+      transform: scale(1.01);
+      box-shadow: 0 5px 12px -5px #00000055;
+    }
+
+    .result-box {
+      margin-top: 2rem;
+      background: #0a0e17;
+      border-radius: 1.5rem;
+      padding: 1.4rem 1.5rem;
+      border: 1px solid #20273a;
+    }
+
+    .result-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      color: #7989aa;
+      margin-bottom: 1rem;
+    }
+
+    .status-badge {
+      background: #1f2a3f;
+      padding: 0.25rem 0.9rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #b2c6ff;
+      border: 1px solid #2d3c5c;
+    }
+
+    .response-pre {
+      background: #06090f;
+      padding: 1.2rem;
+      border-radius: 1.2rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: #b7e0ff;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid #1a2237;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #131a29;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 1rem;
+      border: 1px solid #1e2637;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3f5ef0, #8c6cff);
+      border-radius: 10px;
+      transition: width 0.2s ease;
+      box-shadow: 0 0 12px #5f7aff88;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .example-hint {
+      font-size: 0.78rem;
+      color: #6f7d9c;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .example-hint code {
+      background: #1e2538;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      color: #b4c2e0;
+      border: 1px solid #303a52;
+    }
+
+    .warning-note {
+      font-size: 0.72rem;
+      color: #6b7b9c;
+      margin-top: 1.5rem;
+      text-align: center;
+      border-top: 1px solid #1e2538;
+      padding-top: 1.2rem;
+    }
+
+    .warning-note strong {
+      color: #a7b9ff;
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 0.75rem; align-items: flex-start; }
+      .card { margin: 0.5rem 0; padding: 1.5rem 1rem; border-radius: 1.5rem; }
+      h1 { font-size: 1.65rem; }
+      .flex-row { flex-direction: column; align-items: stretch; }
+      .btn, .btn-secondary { flex: 1 1 auto; width: 100%; }
+      .count-row { align-items: stretch; }
+      .quick-btns { width: 100%; }
+      .quick-btn { flex: 1 1 28%; }
+      .response-pre { max-height: 38vh; font-size: 0.78rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>
+      <span aria-hidden="true">✉</span> NGL Bulk Sender
+    </h1>
+    <div class="subhead">
+      Kirim pesan anonim berkali-kali ke username target
+    </div>
+
+    <div class="input-group">
+      <label for="username">Username target</label>
+      <input type="text" id="username" class="input-field" placeholder="contoh: target" value="target" autocomplete="off">
+    </div>
+
+    <div class="input-group">
+      <label for="message">Pesan</label>
+      <textarea id="message" class="input-field" placeholder="Tulis pesanmu di sini..." rows="3">test</textarea>
+    </div>
+
+    <div class="input-group">
+      <label for="count">Jumlah pesan yang dikirim</label>
+      <div class="count-row">
+        <input type="number" id="count" class="input-field" value="5" min="1" max="200">
+        <div class="quick-btns">
+          <button class="quick-btn" data-count="1">1</button>
+          <button class="quick-btn active" data-count="5">5</button>
+          <button class="quick-btn" data-count="10">10</button>
+          <button class="quick-btn" data-count="25">25</button>
+          <button class="quick-btn" data-count="50">50</button>
+          <button class="quick-btn" data-count="100">100</button>
+        </div>
+      </div>
+      <div class="example-hint">
+        <span>⚠️ Maks 200 per sesi. Ada jeda kecil antar pesan biar gak kena rate limit.</span>
+      </div>
+    </div>
+
+    <div class="flex-row">
+      <button class="btn" id="sendBtn">
+        <span aria-hidden="true">➤</span> Mulai kirim
+      </button>
+      <button class="btn btn-secondary" id="resetBtn">
+        <span aria-hidden="true">↻</span> Reset
+      </button>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">
+        <span>Log pengiriman</span>
+        <span class="status-badge" id="statusBadge" role="status" aria-live="polite">menunggu</span>
+      </div>
+      <pre class="response-pre" id="responseArea">// log pengiriman akan muncul di sini</pre>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="warning-note">
+      <strong>⚡ API:</strong> ngl-bomber-plum.vercel.app<br>
+      Parameter: <code style="background:#181f30; padding:2px 8px; border-radius:20px;">username</code> dan 
+      <code style="background:#181f30; padding:2px 8px; border-radius:20px;">message</code>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FLOX AI CAPABILITY ENTRY
+       Blok ini membuat file HTML ini bisa dijalankan oleh FLOX AI.
+       Fungsi sendNGLMessage harus top-level (bukan di dalam IIFE) agar
+       window['sendNGLMessage'] ditemukan oleh harness postMessage FLOX.
+       Fungsi _nglSendOne & konstanta diberi prefix _ agar tidak bentrok
+       dengan variabel apa pun di dalam blok UI (IIFE) di bawah.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+  /** @flox-capability {"name":"NGL Sender","version":"1.3.0","category":"custom.capability","description":"Kirim pesan anonim ke NGL secara berurutan dengan timeout, retry terbatas, validasi input, dan progress.","entry":"sendNGLMessage","permissions":["network"]} */
+
+  const _NGL_API_BASE = 'https://ngl-bomber-plum.vercel.app/api/send';
+  const _REQUEST_TIMEOUT_MS = 10000;
+  const _MAX_RETRIES = 1;
+  const _DEFAULT_DELAY_MS = 350;
+
+  function _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function _nglSendOne(username, message) {
+    const targetUrl = new URL(_NGL_API_BASE);
+    targetUrl.searchParams.set('username', username);
+    targetUrl.searchParams.set('message', message);
+
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= _MAX_RETRIES; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), _REQUEST_TIMEOUT_MS);
+
+      try {
+        const res = await fetch(targetUrl.toString(), {
+          method: 'GET',
+          headers: { 'Accept': 'application/json, text/plain, */*' },
+          cache: 'no-store',
+          signal: controller.signal
+        });
+
+        const raw = await res.text();
+        let parsed = null;
+        try { parsed = JSON.parse(raw); } catch (_) {}
+
+        clearTimeout(timer);
+
+        return {
+          ok: res.ok,
+          status: res.status,
+          data: parsed,
+          raw,
+          attempt: attempt + 1
+        };
+      } catch (err) {
+        clearTimeout(timer);
+        lastError = err;
+
+        if (attempt < _MAX_RETRIES) {
+          await _sleep(250);
+        }
+      }
+    }
+
+    return {
+      ok: false,
+      status: 0,
+      data: null,
+      raw: '',
+      error: String(lastError && lastError.message || lastError || 'Network error'),
+      timeout: !!(lastError && lastError.name === 'AbortError')
+    };
+  }
+
+  async function sendNGLMessage(input, onProgress) {
+    const username = String((input && input.username) || '').trim().replace(/^@+/, '');
+    const message = String((input && input.message) || '').trim();
+
+    let count = parseInt((input && input.count) || 1, 10);
+    const delayMs = Math.max(
+      200,
+      Math.min(5000, parseInt((input && input.delayMs) || _DEFAULT_DELAY_MS, 10) || _DEFAULT_DELAY_MS)
+    );
+
+    if (!username) throw new Error('username wajib diisi');
+    if (!message) throw new Error('message wajib diisi');
+
+    if (!Number.isFinite(count) || count < 1) count = 1;
+    if (count > 50) count = 50;
+
+    if (typeof onProgress === 'function') {
+      onProgress(`Mengirim ${count} pesan ke @${username}...`);
+    }
+
+    const logs = [];
+    let sent = 0;
+    let failed = 0;
+
+    for (let i = 1; i <= count; i++) {
+      const result = await _nglSendOne(username, message);
+      const time = new Date().toLocaleTimeString('id-ID');
+
+      if (result.data && result.data.success === true) {
+        sent++;
+        logs.push({ n: i, ok: true, status: result.status, attempt: result.attempt, time });
+      } else {
+        failed++;
+        logs.push({
+          n: i,
+          ok: false,
+          status: result.status,
+          attempt: result.attempt || 0,
+          reason: result.timeout ? 'timeout' : (result.data?.success === false ? 'API menolak' : 'request gagal'),
+          error: result.error || null,
+          time
+        });
+      }
+
+      if (typeof onProgress === 'function') {
+        onProgress(`${i}/${count} — OK: ${sent} / Gagal: ${failed}`);
+      }
+
+      if (i < count) await _sleep(delayMs);
+    }
+
+    return { sent, failed, total: count, logs };
+  }
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       UI STANDALONE (browser langsung — tidak dipakai saat FLOX menjalankan
+       capability; FLOX hanya memanggil sendNGLMessage() di atas via iframe
+       tersembunyi dan membaca return value-nya)
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      const usernameInput = document.getElementById('username');
+      const messageInput = document.getElementById('message');
+      const countInput = document.getElementById('count');
+      const sendBtn = document.getElementById('sendBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const responseArea = document.getElementById('responseArea');
+      const statusBadge = document.getElementById('statusBadge');
+      const progressFill = document.getElementById('progressFill');
+      const quickBtns = document.querySelectorAll('.quick-btn');
+
+      const API_BASE = 'https://ngl-bomber-plum.vercel.app/api/send';
+      const DELAY_MS = 350; // jeda antar pesan
+
+      let isSending = false;
+
+      function setBadge(text, type = 'neutral') {
+        statusBadge.textContent = text;
+        const styles = {
+          neutral: ['#1f2a3f', '#b2c6ff', '#2d3c5c'],
+          loading: ['#2a2f45', '#c7d2ff', '#3e4a6b'],
+          success: ['#1f3a2a', '#a3e0b0', '#2c5a3a'],
+          warn:    ['#3a2e1e', '#ffd9a3', '#6b4f35'],
+          error:   ['#3a1e1e', '#ffb3b3', '#6b3535']
+        };
+        const [bg, color, border] = styles[type] || styles.neutral;
+        statusBadge.style.background = bg;
+        statusBadge.style.color = color;
+        statusBadge.style.borderColor = border;
+      }
+
+      function setProgress(current, total) {
+        const pct = total > 0 ? (current / total) * 100 : 0;
+        progressFill.style.width = pct + '%';
+      }
+
+      // Quick count buttons
+      quickBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          quickBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          countInput.value = btn.dataset.count;
+        });
+      });
+
+      countInput.addEventListener('input', () => {
+        quickBtns.forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.count) === parseInt(countInput.value));
+        });
+      });
+
+      const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+      // Kirim SATU pesan dengan timeout + retry ringan.
+      async function sendOne(username, message) {
+        const url = new URL(API_BASE);
+        url.searchParams.set('username', username);
+        url.searchParams.set('message', message);
+
+        let lastError = null;
+
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 10000);
+
+          try {
+            const response = await fetch(url.toString(), {
+              method: 'GET',
+              headers: { 'Accept': 'application/json, text/plain, */*' },
+              cache: 'no-store',
+              signal: controller.signal
+            });
+
+            const rawText = await response.text();
+            let parsed = null;
+            try { parsed = JSON.parse(rawText); } catch (_) {}
+
+            clearTimeout(timer);
+
+            return {
+              ok: response.ok,
+              status: response.status,
+              data: parsed,
+              raw: rawText,
+              attempt
+            };
+          } catch (err) {
+            clearTimeout(timer);
+            lastError = err;
+            if (attempt < 2) await sleep(250);
+          }
+        }
+
+        return {
+          ok: false,
+          status: 0,
+          data: null,
+          raw: '',
+          error: String(lastError && lastError.message || lastError || 'Network error'),
+          timeout: !!(lastError && lastError.name === 'AbortError')
+        };
+      }
+
+      async function startSending() {
+        if (isSending) return;
+
+        const username = usernameInput.value.trim();
+        const message = messageInput.value.trim();
+        let total = parseInt(countInput.value, 10);
+
+        if (!username) {
+          setBadge('⚠️ username kosong', 'warn');
+          responseArea.textContent = '// Error: Username tidak boleh kosong';
+          return;
+        }
+        if (!message) {
+          setBadge('⚠️ pesan kosong', 'warn');
+          responseArea.textContent = '// Error: Pesan tidak boleh kosong';
+          return;
+        }
+        if (isNaN(total) || total < 1) total = 1;
+        if (total > 200) total = 200;
+
+        isSending = true;
+        sendBtn.disabled = true;
+        resetBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="loader"></span> Mengirim...';
+        responseArea.textContent = '';
+        setProgress(0, total);
+
+        let successCount = 0;
+        let failedCount = 0;
+        const startTime = Date.now();
+
+        for (let i = 1; i <= total; i++) {
+          setBadge(`⏳ ${i}/${total}`, 'loading');
+
+          const result = await sendOne(username, message);
+
+          // Log ke console internal
+          const timeStr = new Date().toLocaleTimeString('id-ID');
+          let logLine;
+
+          if (result.data && result.data.success === true) {
+            successCount++;
+            logLine = `[${timeStr}] #${i} ✅ sukses • HTTP ${result.status}`;
+          } else if (result.data && result.data.success === false) {
+            failedCount++;
+            logLine = `[${timeStr}] #${i} ⚠️ API menolak • HTTP ${result.status}`;
+          } else if (result.timeout) {
+            failedCount++;
+            logLine = `[${timeStr}] #${i} ❌ timeout`;
+          } else {
+            failedCount++;
+            logLine = `[${timeStr}] #${i} ❌ request gagal • HTTP ${result.status || '—'}`;
+          }
+
+          responseArea.textContent += logLine + '\n';
+          responseArea.scrollTop = responseArea.scrollHeight;
+
+          setProgress(i, total);
+
+          // Jeda antar pesan, kecuali di pesan terakhir
+          if (i < total) await sleep(DELAY_MS);
+        }
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        const summary = `\n──────────────\n✅ Berhasil: ${successCount}/${total}\n${failedCount > 0 ? `⚠️ Gagal: ${failedCount}\n` : ''}⏱️  Durasi: ${elapsed}s`;
+
+        responseArea.textContent += summary;
+        responseArea.scrollTop = responseArea.scrollHeight;
+
+        if (failedCount === 0) {
+          setBadge(`✅ selesai • ${successCount}/${total}`, 'success');
+        } else {
+          setBadge(`⚠️ selesai • ${successCount}/${total}`, 'warn');
+        }
+
+        isSending = false;
+        sendBtn.disabled = false;
+        resetBtn.disabled = false;
+        sendBtn.innerHTML = '<span aria-hidden="true">➤</span> Mulai kirim';
+      }
+
+      function resetForm() {
+        if (isSending) return;
+        usernameInput.value = 'target';
+        messageInput.value = 'test';
+        countInput.value = '5';
+        quickBtns.forEach(b => b.classList.toggle('active', b.dataset.count === '5'));
+        setBadge('menunggu', 'neutral');
+        responseArea.textContent = '// log pengiriman akan muncul di sini';
+        setProgress(0, 1);
+        usernameInput.focus();
+      }
+
+      sendBtn.addEventListener('click', startSending);
+      resetBtn.addEventListener('click', resetForm);
+
+      messageInput.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          startSending();
+        }
+      });
+
+      usernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          messageInput.focus();
+        }
+      });
+
+      // init
+      setBadge('menunggu', 'neutral');
+      setProgress(0, 1);
+    })();
+  </script>
+</body>
+</html>
